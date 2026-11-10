@@ -6,7 +6,7 @@ import { findSection, sections } from "@/lib/nav";
 
 // Временная страница для разделов, которые ещё не реализованы.
 export function generateStaticParams() {
-  return sections.filter((s) => s.slug).map((s) => ({ section: s.slug }));
+  return sections.filter((s) => s.slug && !s.ready).map((s) => ({ section: s.slug }));
 }
 
 export async function generateMetadata({
@@ -19,7 +19,7 @@ export async function generateMetadata({
 export default async function SectionPage({ params }: PageProps<"/[section]">) {
   const { section } = await params;
   const item = findSection(section);
-  if (!item || !item.slug) notFound();
+  if (!item || !item.slug || item.ready) notFound();
   const Icon = item.icon;
   return (
     <>

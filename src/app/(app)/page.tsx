@@ -8,14 +8,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { TasksSummary } from "@/features/tasks/tasks-summary";
 import { sections } from "@/lib/nav";
+
+// Сводки реализованных разделов; у остальных — «Пока нет данных».
+const summaries: Record<string, React.ReactNode> = {
+  tasks: <TasksSummary />,
+};
 
 export default function DashboardPage() {
   return (
     <>
       <PageHeader title="Главная" description={<TodayDate />} />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {sections.slice(1).map(({ href, title, description, icon: Icon }) => (
+        {sections.slice(1).map(({ slug, href, title, description, icon: Icon }) => (
           <Link key={href} href={href} className="group rounded-xl outline-none">
             <Card className="h-full transition-colors group-hover:border-ring/40 group-focus-visible:ring-2 group-focus-visible:ring-ring/50">
               <CardHeader className="flex-row items-center gap-3">
@@ -28,7 +34,7 @@ export default function DashboardPage() {
                 </div>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
-                Пока нет данных
+                {summaries[slug] ?? "Пока нет данных"}
               </CardContent>
             </Card>
           </Link>

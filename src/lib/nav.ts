@@ -22,6 +22,8 @@ export type Section = {
   title: string;
   description: string;
   icon: LucideIcon;
+  // У раздела есть собственная страница (иначе показывается заглушка).
+  ready: boolean;
 };
 
 function section(
@@ -29,15 +31,16 @@ function section(
   title: string,
   description: string,
   icon: LucideIcon,
+  ready = false,
 ): Section {
-  return { slug, href: slug ? `/${slug}` : "/", title, description, icon };
+  return { slug, href: slug ? `/${slug}` : "/", title, description, icon, ready };
 }
 
 export const sections: Section[] = [
-  section("", "Главная", "Обзор и общая статистика", LayoutDashboard),
+  section("", "Главная", "Обзор и общая статистика", LayoutDashboard, true),
   section("goals", "Цели", "Цели и прогресс", Target),
   section("habits", "Привычки", "Ежедневные привычки", Repeat),
-  section("tasks", "Задачи", "Список дел", CheckSquare),
+  section("tasks", "Задачи", "Список дел", CheckSquare, true),
   section("calendar", "Календарь", "События и планы", CalendarDays),
   section("projects", "Проекты", "Проекты и этапы", FolderKanban),
   section("learning", "Обучение", "Курсы, книги и навыки", GraduationCap),
