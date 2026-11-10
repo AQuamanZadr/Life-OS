@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { z } from "zod";
+import { goalSchema } from "@/features/goals/schema";
+import { projectSchema } from "@/features/projects/schema";
 import { taskSchema } from "@/features/tasks/schema";
 import {
   clearLocalData,
@@ -19,6 +21,8 @@ import { fromRemote, toRemote } from "./mapping";
 type Row = { id: string; updatedAt: string };
 
 const schemas: Record<SyncedTable, z.ZodType<Row>> = {
+  goals: goalSchema,
+  projects: projectSchema,
   tasks: taskSchema,
 };
 
@@ -89,10 +93,17 @@ async function run() {
       return;
     }
     await ensureOwner(userId);
+    // Сбой одной таблицы не должен останавливать синхронизацию остальных.
+    let failed = false;
     for (const table of syncedTables) {
-      await pull(supabase, table);
-      await push(supabase, table);
+      try {
+        await pull(supabase, table);
+        await push(supabase, table);
+      } catch {
+        failed = true;
+      }
     }
+    if (failed) throw new Error("sync incomplete");
     setState({ status: "idle", lastSyncedAt: new Date().toISOString() });
   } catch {
     // Подробности ошибки не выводим: в них могут быть личные данные.

@@ -5,18 +5,21 @@ import {
   CalendarDays,
   CheckCircle2,
   Circle,
+  FolderKanban,
   Pencil,
   Plus,
-  Search,
+  Target,
   Trash2,
 } from "lucide-react";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PageHeader } from "@/components/layout/page-header";
+import { ListToolbar } from "@/components/list-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { useGoals } from "@/features/goals/use-goals";
+import { useProjects } from "@/features/projects/use-projects";
 import { formatDateKey } from "@/lib/dates";
 import { useToday } from "@/lib/use-today";
 import { cn } from "@/lib/utils";
@@ -39,6 +42,11 @@ import { useTasks } from "./use-tasks";
 
 export function TasksView() {
   const tasks = useTasks();
+  const projects = useProjects();
+  const goals = useGoals();
+  const titles = new Map(
+    [...(projects ?? []), ...(goals ?? [])].map((r) => [r.id, r.title]),
+  );
   const [filter, setFilter] = useState<TaskFilter>(defaultTaskFilter);
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Task | null>(null);
@@ -60,19 +68,11 @@ export function TasksView() {
         </Button>
       </PageHeader>
 
-      <div className="mb-4 flex flex-col gap-2 sm:flex-row">
-        <div className="relative flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            aria-label="Поиск по задачам"
-            placeholder="Поиск по задачам…"
-            className="pl-9"
-            value={filter.query}
-            onChange={(e) => setFilter({ ...filter, query: e.target.value })}
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-2 sm:flex">
+      <ListToolbar
+        query={filter.query}
+        onQueryChange={(query) => setFilter({ ...filter, query })}
+        placeholder="Поиск по задачам"
+      >
           <Select
             aria-label="Статус"
             className="sm:w-44"
@@ -110,8 +110,7 @@ export function TasksView() {
               </option>
             ))}
           </Select>
-        </div>
-      </div>
+      </ListToolbar>
 
       <Card>
         {tasks === undefined ? (
@@ -147,6 +146,8 @@ export function TasksView() {
                 key={task.id}
                 task={task}
                 today={today}
+                project={task.projectId ? titles.get(task.projectId) : undefined}
+                goal={task.goalId ? titles.get(task.goalId) : undefined}
                 onEdit={() => setEditing(task)}
                 onDelete={() => setDeleting(task)}
               />
@@ -162,30 +163,16 @@ export function TasksView() {
         onOpenChange={(open) => !open && setEditing(null)}
         task={editing ?? undefined}
       />
-      <Dialog
+      <ConfirmDialog
         open={deleting !== null}
-        onOpenChange={(open) => !open && setDeleting(null)}
-      >
-        <DialogContent
-          title="Удалить задачу?"
-          description={deleting ? `«${deleting.title}» будет удалена.` : undefined}
-        >
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setDeleting(null)}>
-              Отмена
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={async () => {
-                if (deleting) await deleteTask(deleting.id);
-                setDeleting(null);
-              }}
-            >
-              Удалить
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+        title="Удалить задачу?"
+        description={deleting ? `«${deleting.title}» будет удалена.` : undefined}
+        onCancel={() => setDeleting(null)}
+        onConfirm={async () => {
+          if (deleting) await deleteTask(deleting.id);
+          setDeleting(null);
+        }}
+      />
     </>
   );
 }
@@ -193,11 +180,15 @@ export function TasksView() {
 function TaskRow({
   task,
   today,
+  project,
+  goal,
   onEdit,
   onDelete,
 }: {
   task: Task;
   today: string;
+  project?: string;
+  goal?: string;
   onEdit: () => void;
   onDelete: () => void;
 }) {
@@ -247,6 +238,18 @@ function TaskRow({
               <CalendarDays />
               {formatDateKey(task.dueDate, today)}
               {overdue && " · просрочено"}
+            </Badge>
+          )}
+          {project && (
+            <Badge className="max-w-full">
+              <FolderKanban />
+              <span className="truncate">{project}</span>
+            </Badge>
+          )}
+          {goal && (
+            <Badge className="max-w-full">
+              <Target />
+              <span className="truncate">{goal}</span>
             </Badge>
           )}
         </div>

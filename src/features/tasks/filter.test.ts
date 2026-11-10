@@ -92,6 +92,8 @@ describe("taskInputSchema", () => {
     status: "todo",
     priority: "medium",
     dueDate: null,
+    projectId: null,
+    goalId: null,
   };
 
   it("обрезает пробелы в названии", () => {

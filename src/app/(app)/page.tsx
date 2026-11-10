@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ActiveCount } from "@/components/active-count";
 import { PageHeader } from "@/components/layout/page-header";
 import { TodayDate } from "@/components/today-date";
 import {
@@ -13,6 +14,8 @@ import { sections } from "@/lib/nav";
 
 // Сводки реализованных разделов; у остальных — «Пока нет данных».
 const summaries: Record<string, React.ReactNode> = {
+  goals: <ActiveCount table="goals" label="В работе" />,
+  projects: <ActiveCount table="projects" label="Активных" />,
   tasks: <TasksSummary />,
 };
 

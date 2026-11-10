@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { isValidDateKey } from "@/lib/dates";
+import {
+  dateKeyField,
+  isoDateTime,
+  notesField,
+  rowFields,
+  titleField,
+} from "@/lib/schema";
 
 export const taskStatuses = ["todo", "in_progress", "done"] as const;
 export const taskPriorities = ["low", "medium", "high"] as const;
@@ -20,34 +26,21 @@ export const priorityLabels: Record<TaskPriority, string> = {
 };
 
 export const taskInputSchema = z.object({
-  title: z
-    .string()
-    .trim()
-    .min(1, "Введите название")
-    .max(200, "Не длиннее 200 символов"),
-  notes: z.string().trim().max(5000, "Не длиннее 5000 символов"),
+  title: titleField,
+  notes: notesField,
   status: z.enum(taskStatuses),
   priority: z.enum(taskPriorities),
-  dueDate: z
-    .string()
-    .refine(isValidDateKey, "Некорректная дата")
-    .nullable(),
+  dueDate: dateKeyField.nullable(),
+  projectId: z.uuid().nullable(),
+  goalId: z.uuid().nullable(),
 });
 
 export type TaskInput = z.infer<typeof taskInputSchema>;
 
-const isoDateTime = z.iso.datetime();
-
 // Полная запись задачи; ею же проверяются данные, пришедшие из облака.
 export const taskSchema = taskInputSchema.extend({
-  id: z.uuid(),
-  projectId: z.uuid().nullable(),
-  goalId: z.uuid().nullable(),
-  createdAt: isoDateTime,
-  updatedAt: isoDateTime,
+  ...rowFields,
   completedAt: isoDateTime.nullable(),
-  // Мягкое удаление: запись нужна, чтобы передать удаление при синхронизации.
-  deletedAt: isoDateTime.nullable(),
 });
 
 export type Task = z.infer<typeof taskSchema>;
