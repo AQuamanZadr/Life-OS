@@ -36,13 +36,18 @@ export const taskInputSchema = z.object({
 
 export type TaskInput = z.infer<typeof taskInputSchema>;
 
-export type Task = TaskInput & {
-  id: string;
-  projectId: string | null;
-  goalId: string | null;
-  createdAt: string;
-  updatedAt: string;
-  completedAt: string | null;
+const isoDateTime = z.iso.datetime();
+
+// Полная запись задачи; ею же проверяются данные, пришедшие из облака.
+export const taskSchema = taskInputSchema.extend({
+  id: z.uuid(),
+  projectId: z.uuid().nullable(),
+  goalId: z.uuid().nullable(),
+  createdAt: isoDateTime,
+  updatedAt: isoDateTime,
+  completedAt: isoDateTime.nullable(),
   // Мягкое удаление: запись нужна, чтобы передать удаление при синхронизации.
-  deletedAt: string | null;
-};
+  deletedAt: isoDateTime.nullable(),
+});
+
+export type Task = z.infer<typeof taskSchema>;

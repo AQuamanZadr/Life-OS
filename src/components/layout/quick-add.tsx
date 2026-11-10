@@ -11,7 +11,7 @@ export function QuickAdd() {
     <>
       <Button
         variant="outline"
-        className="ml-auto shrink-0"
+        className="shrink-0"
         onClick={() => setOpen(true)}
         aria-label="Новая задача"
       >

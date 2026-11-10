@@ -14,7 +14,9 @@ export default defineConfig({
   webServer: {
     command: `npm run build && npm run start -- -p ${port}`,
     url: `http://localhost:${port}`,
-    reuseExistingServer: !process.env.CI,
+    // Тесты идут без входа и облака, чтобы не трогать настоящие данные.
+    env: { NEXT_PUBLIC_LOCAL_ONLY: "1" },
+    reuseExistingServer: false,
     timeout: 180_000,
   },
 });

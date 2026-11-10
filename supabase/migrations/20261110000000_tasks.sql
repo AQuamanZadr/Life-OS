@@ -1,3 +1,15 @@
+-- Время последнего изменения строки на сервере; по нему устройства забирают обновления.
+create or replace function public.set_server_updated_at()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  new.server_updated_at = now();
+  return new;
+end;
+$$;
+
 -- Задачи. Доступ только владельцу строки (RLS).
 create table public.tasks (
   id uuid primary key,
@@ -12,10 +24,15 @@ create table public.tasks (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   completed_at timestamptz,
-  deleted_at timestamptz
+  deleted_at timestamptz,
+  server_updated_at timestamptz not null default now()
 );
 
-create index tasks_user_updated_idx on public.tasks (user_id, updated_at);
+create index tasks_user_server_updated_idx on public.tasks (user_id, server_updated_at);
+
+create trigger tasks_set_server_updated_at
+  before insert or update on public.tasks
+  for each row execute function public.set_server_updated_at();
 
 alter table public.tasks enable row level security;
 

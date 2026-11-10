@@ -1,3 +1,4 @@
+import { SignOut } from "./sign-out";
 import { Logo, NavLinks } from "./nav-links";
 
 export function Sidebar() {
@@ -9,6 +10,7 @@ export function Sidebar() {
       <div className="flex-1 overflow-y-auto px-3 pb-4">
         <NavLinks />
       </div>
+      <SignOut />
     </aside>
   );
 }

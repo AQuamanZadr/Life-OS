@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+import { db, markDirty } from "@/lib/db";
+import { requestSync } from "@/lib/sync/engine";
 import { taskInputSchema, type Task, type TaskInput } from "./schema";
 
 function completedAtFor(
@@ -8,6 +9,21 @@ function completedAtFor(
 ): string | null {
   if (status !== "done") return null;
   return previous ?? now;
+}
+
+// Изменяет задачу и ставит её в очередь синхронизации одной транзакцией.
+async function patchTask(
+  id: string,
+  change: (current: Task, now: string) => Partial<Task>,
+): Promise<void> {
+  const now = new Date().toISOString();
+  await db.transaction("rw", db.tasks, db.outbox, async () => {
+    const current = await db.tasks.get(id);
+    if (!current || current.deletedAt) throw new Error("Задача не найдена");
+    await db.tasks.update(id, { ...change(current, now), updatedAt: now });
+    await markDirty("tasks", id, now);
+  });
+  requestSync();
 }
 
 export async function createTask(input: TaskInput): Promise<Task> {
@@ -23,34 +39,29 @@ export async function createTask(input: TaskInput): Promise<Task> {
     completedAt: completedAtFor(data.status, null, now),
     deletedAt: null,
   };
-  await db.tasks.add(task);
+  await db.transaction("rw", db.tasks, db.outbox, async () => {
+    await db.tasks.add(task);
+    await markDirty("tasks", task.id, now);
+  });
+  requestSync();
   return task;
 }
 
-export async function updateTask(id: string, input: TaskInput): Promise<void> {
+export function updateTask(id: string, input: TaskInput): Promise<void> {
   const data = taskInputSchema.parse(input);
-  const now = new Date().toISOString();
-  await db.transaction("rw", db.tasks, async () => {
-    const current = await db.tasks.get(id);
-    if (!current || current.deletedAt) throw new Error("Задача не найдена");
-    await db.tasks.update(id, {
-      ...data,
-      updatedAt: now,
-      completedAt: completedAtFor(data.status, current.completedAt, now),
-    });
-  });
+  return patchTask(id, (current, now) => ({
+    ...data,
+    completedAt: completedAtFor(data.status, current.completedAt, now),
+  }));
 }
 
-export async function setTaskDone(id: string, done: boolean): Promise<void> {
-  const now = new Date().toISOString();
-  await db.tasks.update(id, {
+export function setTaskDone(id: string, done: boolean): Promise<void> {
+  return patchTask(id, (_, now) => ({
     status: done ? "done" : "todo",
     completedAt: done ? now : null,
-    updatedAt: now,
-  });
+  }));
 }
 
-export async function deleteTask(id: string): Promise<void> {
-  const now = new Date().toISOString();
-  await db.tasks.update(id, { deletedAt: now, updatedAt: now });
+export function deleteTask(id: string): Promise<void> {
+  return patchTask(id, (_, now) => ({ deletedAt: now }));
 }
