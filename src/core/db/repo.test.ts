@@ -33,7 +33,7 @@ describe("репозиторий: CRUD", () => {
     await expect(createRecord("habits", { title: "x", start_date: "2026-01-01", habit_type: "numeric", target_value: -1 })).rejects.toBeInstanceOf(ValidationError);
     expect(await getDb().tasks.count()).toBe(0);
     expect(await ops()).toHaveLength(0);
-    const err = await createRecord("tasks", { title: "" }).catch((e) => e as ValidationError);
+    const err = (await createRecord("tasks", { title: "" }).catch((e) => e)) as ValidationError;
     expect(err.fields.title).toBeTruthy();
   });
 

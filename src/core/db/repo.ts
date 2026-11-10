@@ -198,6 +198,14 @@ export async function purgeRecord<T extends TableName>(table: T, id: string): Pr
     const db = getDb();
     const current = await db.rows(table).get(id);
     if (!current) return;
+    if (table === "accounts") {
+      const used = await db.transactions.filter((t) => t.account_id === id || t.to_account_id === id).count();
+      if (used > 0) throw new BusinessRuleError("По счёту есть операции. Сначала удалите их окончательно или переместите счёт в архив.");
+    }
+    if (table === "categories") {
+      const scores = await db.life_balance.where("category_id").equals(id).toArray();
+      for (const s of scores) await purgeRecord("life_balance", s.id);
+    }
     for (const child of CASCADES[table] ?? []) {
       const rows = (await db.table(child.table).where(child.field).equals(id).toArray()) as { id: string }[];
       for (const r of rows) await purgeRecord(child.table, r.id);
