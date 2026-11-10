@@ -22,7 +22,7 @@ import { fromRemote, toRemote } from "./mapping";
 
 type Row = { id: string; updatedAt: string };
 
-const schemas: Record<SyncedTable, z.ZodType<Row>> = {
+export const schemas: Record<SyncedTable, z.ZodType<Row>> = {
   goals: goalSchema,
   projects: projectSchema,
   tasks: taskSchema,
