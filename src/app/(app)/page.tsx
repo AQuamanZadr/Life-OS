@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CalendarSummary } from "@/features/calendar/calendar-summary";
 import { FinanceSummary } from "@/features/finance/finance-summary";
 import { HabitsSummary } from "@/features/habits/habits-summary";
 import { TasksSummary } from "@/features/tasks/tasks-summary";
@@ -19,6 +20,7 @@ import { sections } from "@/lib/nav";
 const summaries: Record<string, React.ReactNode> = {
   goals: <ActiveCount table="goals" label="В работе" />,
   projects: <ActiveCount table="projects" label="Активных" />,
+  calendar: <CalendarSummary />,
   finance: <FinanceSummary />,
   habits: <HabitsSummary />,
   tasks: <TasksSummary />,

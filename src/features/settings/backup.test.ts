@@ -33,6 +33,7 @@ function tables(over: Partial<Record<SyncedTable, unknown[]>> = {}): BackupTable
     habit_logs: [log],
     transactions: [tx],
     time_entries: [],
+    events: [],
     ...over,
   } as BackupTables;
 }

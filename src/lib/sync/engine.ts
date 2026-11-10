@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { z } from "zod";
+import { eventSchema } from "@/features/calendar/schema";
 import { transactionSchema } from "@/features/finance/schema";
 import { goalSchema } from "@/features/goals/schema";
 import { habitLogSchema, habitSchema } from "@/features/habits/schema";
@@ -31,6 +32,7 @@ export const schemas: Record<SyncedTable, z.ZodType<Row>> = {
   habit_logs: habitLogSchema,
   transactions: transactionSchema,
   time_entries: timeEntrySchema,
+  events: eventSchema,
 };
 
 const PAGE = 500;
