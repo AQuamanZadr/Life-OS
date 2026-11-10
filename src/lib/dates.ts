@@ -26,3 +26,19 @@ export function formatDateKey(value: string, today: string): string {
     year: value.slice(0, 4) === today.slice(0, 4) ? undefined : "numeric",
   }).format(new Date(y, m - 1, d));
 }
+
+export function parseDateKey(value: string): Date {
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+export function addDays(value: string, days: number): string {
+  const date = parseDateKey(value);
+  date.setDate(date.getDate() + days);
+  return toDateKey(date);
+}
+
+// День недели по ISO: 1 — понедельник, 7 — воскресенье.
+export function isoWeekday(value: string): number {
+  return parseDateKey(value).getDay() || 7;
+}

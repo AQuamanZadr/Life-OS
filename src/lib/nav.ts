@@ -39,7 +39,7 @@ function section(
 export const sections: Section[] = [
   section("", "Главная", "Обзор и общая статистика", LayoutDashboard, true),
   section("goals", "Цели", "Цели и прогресс", Target, true),
-  section("habits", "Привычки", "Ежедневные привычки", Repeat),
+  section("habits", "Привычки", "Ежедневные привычки", Repeat, true),
   section("tasks", "Задачи", "Список дел", CheckSquare, true),
   section("calendar", "Календарь", "События и планы", CalendarDays),
   section("projects", "Проекты", "Проекты и этапы", FolderKanban, true),

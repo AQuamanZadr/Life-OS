@@ -37,6 +37,8 @@ test("цель → проект → задача: связи, прогресс �
   const task = page.getByRole("main").getByRole("listitem").filter({ hasText: "Урок 1" });
   await expect(task).toContainText("Курс B2");
   await task.getByRole("checkbox").click();
+  // Выполненная задача уходит из списка активных — значит, запись сохранена.
+  await expect(task).toHaveCount(0);
 
   await page.goto("/projects");
   await expect(project).toContainText("Задачи: 1 из 2");

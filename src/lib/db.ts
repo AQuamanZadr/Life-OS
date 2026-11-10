@@ -1,11 +1,18 @@
 import Dexie, { type EntityTable, type Table } from "dexie";
+import type { Habit, HabitLog } from "@/features/habits/schema";
 import type { Goal } from "@/features/goals/schema";
 import type { Project } from "@/features/projects/schema";
 import type { Task } from "@/features/tasks/schema";
 
 // Таблицы, которые синхронизируются с Supabase (имена совпадают с облачными).
 // Порядок важен: сначала те, на кого ссылаются остальные.
-export const syncedTables = ["goals", "projects", "tasks"] as const;
+export const syncedTables = [
+  "goals",
+  "projects",
+  "tasks",
+  "habits",
+  "habit_logs",
+] as const;
 export type SyncedTable = (typeof syncedTables)[number];
 
 // Запись, ожидающая отправки в облако.
@@ -17,6 +24,8 @@ export const db = new Dexie("life-os") as Dexie & {
   goals: EntityTable<Goal, "id">;
   projects: EntityTable<Project, "id">;
   tasks: EntityTable<Task, "id">;
+  habits: EntityTable<Habit, "id">;
+  habit_logs: EntityTable<HabitLog, "id">;
   outbox: Table<OutboxEntry, [SyncedTable, string]>;
   meta: EntityTable<MetaEntry, "key">;
 };
@@ -38,6 +47,11 @@ db.version(2)
 db.version(3).stores({
   goals: "id, status",
   projects: "id, status, goalId",
+});
+
+db.version(4).stores({
+  habits: "id, status",
+  habit_logs: "id, habitId, date",
 });
 
 // Вызывать внутри транзакции записи, включающей db.outbox.
