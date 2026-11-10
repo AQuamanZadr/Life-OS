@@ -23,6 +23,8 @@ const links: [SyncedTable, string, SyncedTable, boolean][] = [
   ["tasks", "projectId", "projects", false],
   ["tasks", "goalId", "goals", false],
   ["habit_logs", "habitId", "habits", true],
+  ["time_entries", "taskId", "tasks", false],
+  ["time_entries", "projectId", "projects", false],
 ];
 
 export function buildBackup(tables: BackupTables, exportedAt: string): string {

@@ -5,6 +5,7 @@ import {
   CalendarDays,
   CheckCircle2,
   Circle,
+  Clock,
   FolderKanban,
   Pencil,
   Plus,
@@ -20,6 +21,8 @@ import { Card } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import { useGoals } from "@/features/goals/use-goals";
 import { useProjects } from "@/features/projects/use-projects";
+import { formatDuration, msByTask } from "@/features/time/stats";
+import { useTimeEntries } from "@/features/time/use-time";
 import { formatDateKey } from "@/lib/dates";
 import { useToday } from "@/lib/use-today";
 import { cn } from "@/lib/utils";
@@ -47,6 +50,7 @@ export function TasksView() {
   const titles = new Map(
     [...(projects ?? []), ...(goals ?? [])].map((r) => [r.id, r.title]),
   );
+  const tracked = msByTask(useTimeEntries() ?? []);
   const [filter, setFilter] = useState<TaskFilter>(defaultTaskFilter);
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Task | null>(null);
@@ -148,6 +152,7 @@ export function TasksView() {
                 today={today}
                 project={task.projectId ? titles.get(task.projectId) : undefined}
                 goal={task.goalId ? titles.get(task.goalId) : undefined}
+                trackedMs={tracked.get(task.id) ?? 0}
                 onEdit={() => setEditing(task)}
                 onDelete={() => setDeleting(task)}
               />
@@ -182,6 +187,7 @@ function TaskRow({
   today,
   project,
   goal,
+  trackedMs,
   onEdit,
   onDelete,
 }: {
@@ -189,6 +195,7 @@ function TaskRow({
   today: string;
   project?: string;
   goal?: string;
+  trackedMs: number;
   onEdit: () => void;
   onDelete: () => void;
 }) {
@@ -238,6 +245,12 @@ function TaskRow({
               <CalendarDays />
               {formatDateKey(task.dueDate, today)}
               {overdue && " · просрочено"}
+            </Badge>
+          )}
+          {trackedMs >= 60_000 && (
+            <Badge>
+              <Clock />
+              {formatDuration(trackedMs)}
             </Badge>
           )}
           {project && (

@@ -12,6 +12,7 @@ import {
 import { FinanceSummary } from "@/features/finance/finance-summary";
 import { HabitsSummary } from "@/features/habits/habits-summary";
 import { TasksSummary } from "@/features/tasks/tasks-summary";
+import { TimeSummary } from "@/features/time/time-summary";
 import { sections } from "@/lib/nav";
 
 // Сводки реализованных разделов; у остальных — «Пока нет данных».
@@ -21,6 +22,7 @@ const summaries: Record<string, React.ReactNode> = {
   finance: <FinanceSummary />,
   habits: <HabitsSummary />,
   tasks: <TasksSummary />,
+  time: <TimeSummary />,
 };
 
 export default function DashboardPage() {

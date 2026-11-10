@@ -5,6 +5,7 @@ import { goalSchema } from "@/features/goals/schema";
 import { habitLogSchema, habitSchema } from "@/features/habits/schema";
 import { projectSchema } from "@/features/projects/schema";
 import { taskSchema } from "@/features/tasks/schema";
+import { timeEntrySchema } from "@/features/time/schema";
 import {
   clearLocalData,
   db,
@@ -29,6 +30,7 @@ export const schemas: Record<SyncedTable, z.ZodType<Row>> = {
   habits: habitSchema,
   habit_logs: habitLogSchema,
   transactions: transactionSchema,
+  time_entries: timeEntrySchema,
 };
 
 const PAGE = 500;

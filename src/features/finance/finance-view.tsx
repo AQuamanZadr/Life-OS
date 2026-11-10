@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState, ListToolbar } from "@/components/list-toolbar";
+import { MonthNav } from "@/components/month-nav";
+import { Stat } from "@/components/stat";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
@@ -24,11 +26,9 @@ import {
 } from "./schema";
 import {
   expensesByCategory,
-  formatMonth,
   inMonth,
   monthOf,
   monthlyTotals,
-  shiftMonth,
   totals,
 } from "./stats";
 import { TransactionDialog } from "./transaction-dialog";
@@ -83,32 +83,7 @@ export function FinanceView() {
         </Button>
       </PageHeader>
 
-      <div className="mb-4 flex items-center gap-1">
-        <Button
-          variant="outline"
-          size="icon"
-          aria-label="Предыдущий месяц"
-          onClick={() => setPicked(shiftMonth(month, -1))}
-        >
-          <ChevronLeft />
-        </Button>
-        <span className="min-w-36 text-center text-sm font-medium" aria-live="polite">
-          {formatMonth(month)}
-        </span>
-        <Button
-          variant="outline"
-          size="icon"
-          aria-label="Следующий месяц"
-          onClick={() => setPicked(shiftMonth(month, 1))}
-        >
-          <ChevronRight />
-        </Button>
-        {month !== monthOf(today) && (
-          <Button variant="ghost" size="sm" onClick={() => setPicked(null)}>
-            Текущий
-          </Button>
-        )}
-      </div>
+      <MonthNav month={month} currentMonth={monthOf(today)} onChange={setPicked} />
 
       <div className="mb-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Stat label="Доходы" value={formatMoney(sum.income)} />
@@ -255,34 +230,5 @@ export function FinanceView() {
         }}
       />
     </>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  tone,
-  className,
-}: {
-  label: string;
-  value: string;
-  tone?: "positive" | "negative";
-  className?: string;
-}) {
-  return (
-    <Card data-stat={label} className={className}>
-      <CardContent>
-        <p className="text-sm text-muted-foreground">{label}</p>
-        <p
-          className={cn(
-            "mt-1 text-lg font-semibold tabular-nums sm:text-xl",
-            tone === "positive" && "text-success",
-            tone === "negative" && "text-destructive",
-          )}
-        >
-          {value}
-        </p>
-      </CardContent>
-    </Card>
   );
 }

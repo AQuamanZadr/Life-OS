@@ -44,7 +44,7 @@ export const sections: Section[] = [
   section("calendar", "Календарь", "События и планы", CalendarDays),
   section("projects", "Проекты", "Проекты и этапы", FolderKanban, true),
   section("learning", "Обучение", "Курсы, книги и навыки", GraduationCap),
-  section("time", "Время", "Учёт времени", Clock),
+  section("time", "Время", "Учёт времени", Clock, true),
   section("finance", "Финансы", "Доходы и расходы", Wallet, true),
   section("health", "Здоровье", "Показатели здоровья", HeartPulse),
   section("knowledge", "Знания", "Заметки и база знаний", BookOpen),
