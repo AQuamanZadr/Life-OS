@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { z } from "zod";
+import { transactionSchema } from "@/features/finance/schema";
 import { goalSchema } from "@/features/goals/schema";
 import { habitLogSchema, habitSchema } from "@/features/habits/schema";
 import { projectSchema } from "@/features/projects/schema";
@@ -27,6 +28,7 @@ const schemas: Record<SyncedTable, z.ZodType<Row>> = {
   tasks: taskSchema,
   habits: habitSchema,
   habit_logs: habitLogSchema,
+  transactions: transactionSchema,
 };
 
 const PAGE = 500;

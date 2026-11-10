@@ -15,6 +15,9 @@
   --destructive: #dc2626;
   --success: #16a34a;
   --sidebar: #ffffff;
+  /* Графики: палитра проверена на различимость при дальтонизме. */
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
 }
 
 @theme inline {
@@ -32,6 +35,8 @@
   --color-destructive: var(--destructive);
   --color-success: var(--success);
   --color-sidebar: var(--sidebar);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
 }
 

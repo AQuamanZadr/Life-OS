@@ -11,21 +11,26 @@ const rows = <T extends BaseRow>(table: SyncedTable) => db.table<T, string>(tabl
 export async function insertRow<T extends BaseRow>(
   table: SyncedTable,
   data: Omit<T, keyof BaseRow>,
+  // Если id задан заранее, повторный вызов с тем же id ничего не добавит.
+  id: string = crypto.randomUUID(),
 ): Promise<T> {
   const now = new Date().toISOString();
   const row = {
     ...data,
-    id: crypto.randomUUID(),
+    id,
     createdAt: now,
     updatedAt: now,
     deletedAt: null,
   } as T;
-  await db.transaction("rw", rows(table), db.outbox, async () => {
+  const saved = await db.transaction("rw", rows(table), db.outbox, async () => {
+    const existing = await rows<T>(table).get(id);
+    if (existing) return existing;
     await rows<T>(table).add(row);
     await markDirty(table, row.id, now);
+    return row;
   });
   requestSync();
-  return row;
+  return saved;
 }
 
 export async function patchRow<T extends BaseRow>(

@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable, type Table } from "dexie";
 import type { Habit, HabitLog } from "@/features/habits/schema";
+import type { Transaction } from "@/features/finance/schema";
 import type { Goal } from "@/features/goals/schema";
 import type { Project } from "@/features/projects/schema";
 import type { Task } from "@/features/tasks/schema";
@@ -12,6 +13,7 @@ export const syncedTables = [
   "tasks",
   "habits",
   "habit_logs",
+  "transactions",
 ] as const;
 export type SyncedTable = (typeof syncedTables)[number];
 
@@ -26,6 +28,7 @@ export const db = new Dexie("life-os") as Dexie & {
   tasks: EntityTable<Task, "id">;
   habits: EntityTable<Habit, "id">;
   habit_logs: EntityTable<HabitLog, "id">;
+  transactions: EntityTable<Transaction, "id">;
   outbox: Table<OutboxEntry, [SyncedTable, string]>;
   meta: EntityTable<MetaEntry, "key">;
 };
@@ -52,6 +55,10 @@ db.version(3).stores({
 db.version(4).stores({
   habits: "id, status",
   habit_logs: "id, habitId, date",
+});
+
+db.version(5).stores({
+  transactions: "id, date, type, category",
 });
 
 // Вызывать внутри транзакции записи, включающей db.outbox.

@@ -45,7 +45,7 @@ export const sections: Section[] = [
   section("projects", "Проекты", "Проекты и этапы", FolderKanban, true),
   section("learning", "Обучение", "Курсы, книги и навыки", GraduationCap),
   section("time", "Время", "Учёт времени", Clock),
-  section("finance", "Финансы", "Доходы и расходы", Wallet),
+  section("finance", "Финансы", "Доходы и расходы", Wallet, true),
   section("health", "Здоровье", "Показатели здоровья", HeartPulse),
   section("knowledge", "Знания", "Заметки и база знаний", BookOpen),
   section("journal", "Дневник", "Личные записи", NotebookPen),
